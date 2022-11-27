@@ -1,3 +1,4 @@
+import logo from './logo.svg';
 import './App.css';
 import { useWallet } from './context/WalletProvider';
 
@@ -7,10 +8,13 @@ function App() {
   return (
     <div className='App'>
       <header className='App-header'>
-        <button onClick={isAuthenticated ? disconnectWallet : connectWallet} id='wallet-connect'>
-          {isAuthenticated ? 'Disconnect Wallet' : 'Connect Wallet'}
-        </button>
-        Connected to: {account}
+        <img src={logo} className='App-logo' alt='logo' />
+        <p>{isAuthenticated && 'Connected to: ' + account}</p>
+        <p>
+          <button onClick={isAuthenticated ? disconnectWallet : connectWallet} id='wallet-connect'>
+            {isAuthenticated ? 'Disconnect Wallet' : 'Connect Wallet'}
+          </button>
+        </p>
       </header>
     </div>
   );
