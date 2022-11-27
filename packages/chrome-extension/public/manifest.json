@@ -1,11 +1,11 @@
 {
-  "name": "Create React App Sample Chrome Extension",
-  "description": "Chrome extension with React and Typescript",
+  "name": "Scaffold Eth Chrome extension ",
+  "description": "Scaffold Eth Chrome extension with React Typescript",
   "version": "1.0",
   "manifest_version": 3,
   "action": {
     "default_popup": "index.html",
-    "default_title": "Open the popup"
+    "default_title": "Open popup to connect wallet"
   },
   "icons": {
     "16": "logo192.png",
