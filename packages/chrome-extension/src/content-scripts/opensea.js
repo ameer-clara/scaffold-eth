@@ -58,13 +58,13 @@ function delay(ms) {
 
 let sendPayloadToExtension = ({ address, id, chainId }) => {
   // send message to the background script
-  chrome.runtime.sendMessage({ open: true }, async function (response) {
+  chrome.runtime.sendMessage({ open: true }, async (response) => {
     console.log(response);
     // wait for the window to load
     await delay(1000);
     console.log("sending message....", address);
     // send message to the extension popup
-    chrome.runtime.sendMessage({ address, id, chainId }, function (response) {
+    chrome.runtime.sendMessage({ address, id, chainId }, (response) => {
       console.log(response);
     });
   });
@@ -74,8 +74,8 @@ let sendPayloadToExtension = ({ address, id, chainId }) => {
 (async function main() {
   const url = window.location;
   console.log("url:", url);
-  const { address, id } = getAddressAndId(url) || "";
   const nftPayload = getAddressAndId(url) || "";
+  const { address, id } = nftPayload;
 
   // if address and id are found, then we are on an NFT page
   if (address && id) {

@@ -1,9 +1,9 @@
 /* eslint-disable no-undef */
 
-chrome.runtime.onMessage.addListener(async (msg, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   console.log("sender:", sender.tab);
 
-  if (msg.open) {
+  if (message.open) {
     // create new window and load in the extension page
     await chrome.windows.create({
       url: chrome.runtime.getURL("index.html"),

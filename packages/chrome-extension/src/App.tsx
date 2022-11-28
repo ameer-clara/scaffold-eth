@@ -6,11 +6,13 @@ function App() {
   const { isAuthenticated, connectWallet, disconnectWallet, account } = useWallet();
 
   const messageFromContentScript = (message: any, sender: any, sendResponse: any) => {
-    // simulates triggering a transaction
-    connectWallet();
-    sendResponse({
-      data: 'Transaction submitted',
-    });
+    if (message.address) {
+      // simulates triggering a transaction
+      connectWallet();
+      sendResponse({
+        data: 'Transaction submitted',
+      });
+    }
   };
   chrome.runtime.onMessage.addListener(messageFromContentScript);
 
