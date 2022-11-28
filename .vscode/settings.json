@@ -12,7 +12,6 @@
       "**/*.cs": true,
       "**/*.orig": true,
       "**/bin/": true,
-      "**/build/": true,
       "**/debug/": true,
       "**/dist/": true,
       "**/node_modules/": false,
@@ -23,7 +22,6 @@
    },
    "explorerExclude.backup": null,
    "eslint.workingDirectories": [
-   
       { "directory": "packages/eth-hooks", "changeProcessCWD": true },
       { "directory": "packages/hardhat-ts", "changeProcessCWD": true },
       { "directory": "packages/vite-app-ts", "changeProcessCWD": true },
