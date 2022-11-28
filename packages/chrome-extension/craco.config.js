@@ -10,6 +10,7 @@ module.exports = {
             paths.appIndexJs,
           ].filter(Boolean),
           content: "./src/content-scripts/opensea.js",
+          background: "./src/background/index.js",
         },
         output: {
           ...webpackConfig.output,

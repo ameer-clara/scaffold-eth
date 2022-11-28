@@ -22,7 +22,14 @@
       ]
     }
   ],
+  "background": {
+    "service_worker": "./static/js/background.js",
+    "type": "module"
+  },
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "scripting",
+    "webRequest",
+    "webNavigation"
   ]
 }

@@ -5,6 +5,15 @@ import { useWallet } from './context/WalletProvider';
 function App() {
   const { isAuthenticated, connectWallet, disconnectWallet, account } = useWallet();
 
+  const messageFromContentScript = (message: any, sender: any, sendResponse: any) => {
+    // simulates triggering a transaction
+    connectWallet();
+    sendResponse({
+      data: 'Transaction submitted',
+    });
+  };
+  chrome.runtime.onMessage.addListener(messageFromContentScript);
+
   return (
     <div className='App'>
       <header className='App-header'>
