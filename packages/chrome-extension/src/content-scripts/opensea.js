@@ -56,15 +56,15 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-let sendPayloadToExtension = ({ address, id, chainId }) => {
-  // send message to the background script
+let sendPayloadToExtension = (nftPayload) => {
+  // send message to the background script to open the extension in a popup window
   chrome.runtime.sendMessage({ open: true }, async (response) => {
     console.log(response);
     // wait for the window to load
     await delay(1000);
-    console.log("sending message....", address);
-    // send message to the extension popup
-    chrome.runtime.sendMessage({ address, id, chainId }, (response) => {
+    // send message to extension to perform the transaction
+    console.log("sending payload....", nftPayload);
+    chrome.runtime.sendMessage(nftPayload, (response) => {
       console.log(response);
     });
   });

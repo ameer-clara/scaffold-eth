@@ -76,11 +76,6 @@ const WalletProvider = React.memo(({ children }) => {
     return false;
   };
 
-  const getAccountAddress = () => {
-    console.log("Account: ", account);
-    return account;
-  };
-
   const connectWallet = async () => {
     console.log("connectWallet runs....");
     try {

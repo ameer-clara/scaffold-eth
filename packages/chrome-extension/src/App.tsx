@@ -10,7 +10,7 @@ function App() {
       // simulates triggering a transaction
       connectWallet();
       sendResponse({
-        data: 'Transaction submitted',
+        message: 'Transaction submitted',
       });
     }
   };
