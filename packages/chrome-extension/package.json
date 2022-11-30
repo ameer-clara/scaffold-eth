@@ -5,11 +5,12 @@
   "dependencies": {
     "@ant-design/icons": "^4.7.0",
     "antd": "4.16.0",
+    "ethers": "^5.7.2",
     "metamask-extension-provider": "^3.0.0",
     "react": "^17.0.2",
     "react-dom": "17.0.2",
     "react-scripts": "4.0.1",
-    "web3": "^1.8.1"
+    "bnc-notify": "^1.5.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -39,12 +40,12 @@
   "devDependencies": {
     "@babel/helper-environment-visitor": "^7.18.9",
     "@babel/helper-string-parser": "^7.19.4",
-    "@types/chrome": "^0.0.203",
     "@craco/craco": "6.4.5",
     "@jridgewell/gen-mapping": "^0.3.2",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "@types/chrome": "^0.0.203",
     "@types/jest": "^27.5.2",
     "@types/node": "^16.18.3",
     "@types/react": "^16.9.19",

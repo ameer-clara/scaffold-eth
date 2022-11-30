@@ -1,9 +1,8 @@
 import React from "react";
 import createMetaMaskProvider from "metamask-extension-provider";
-import Web3 from "web3";
-import { getNormalizeAddress } from "../utils";
 import { EthereumEvents } from "../utils/events";
 import storage from "../utils/storage";
+import { ethers } from "ethers";
 
 export const WalletContext = React.createContext();
 export const useWallet = () => React.useContext(WalletContext);
@@ -11,11 +10,11 @@ export const useWallet = () => React.useContext(WalletContext);
 const WalletProvider = React.memo(({ children }) => {
   const [chainId, setChainId] = React.useState(null);
   const [account, setAccount] = React.useState(null);
-  const [web3, setWeb3] = React.useState(null);
   const [isAuthenticated, setAuthenticated] = React.useState(false);
   const [appLoading, setAppLoading] = React.useState(false);
+  const [userSigner, setUserSigner] = React.useState(null);
 
-  console.log({ chainId, account, web3, isAuthenticated });
+  // console.log({ chainId, account, isAuthenticated });
 
   React.useEffect(() => {
     connectEagerly();
@@ -63,35 +62,21 @@ const WalletProvider = React.memo(({ children }) => {
     }
   };
 
-  const getAccounts = async (provider) => {
-    if (provider) {
-      const [accounts, chainId] = await Promise.all([
-        provider.request({
-          method: "eth_requestAccounts",
-        }),
-        provider.request({ method: "eth_chainId" }),
-      ]);
-      return [accounts, chainId];
-    }
-    return false;
-  };
-
   const connectWallet = async () => {
-    console.log("connectWallet runs....");
+    console.log("connecting to Wallet");
     try {
-      const provider = getProvider();
-      const [accounts, chainId] = await getAccounts(provider);
-      if (accounts && chainId) {
-        setAppLoading(true);
-        const account = getNormalizeAddress(accounts);
-        const web3 = new Web3(provider);
-        setAccount(account);
-        setChainId(chainId);
-        setWeb3(web3);
-        setAuthenticated(true);
-        storage.set("metamask-connected", { connected: true });
-        subscribeToEvents(provider);
-      }
+      const provider = new ethers.providers.Web3Provider(
+        createMetaMaskProvider()
+      );
+      // Prompt user for account connections
+      await provider.send("eth_requestAccounts", []);
+
+      const signer = provider.getSigner();
+      const acc = await signer.getAddress();
+      setAccount(acc);
+      setAuthenticated(true);
+      setUserSigner(signer);
+      subscribeToEvents(provider);
     } catch (e) {
       console.log("error while connect", e);
     } finally {
@@ -104,17 +89,15 @@ const WalletProvider = React.memo(({ children }) => {
     try {
       storage.set("metamask-connected", { connected: false });
       setAccount(null);
-      setChainId(null);
       setAuthenticated(false);
-      setWeb3(null);
     } catch (e) {
       console.log(e);
     }
   };
 
   const handleAccountsChanged = (accounts) => {
-    setAccount(getNormalizeAddress(accounts));
-    console.log("[account changes]: ", getNormalizeAddress(accounts));
+    setAccount(accounts[0]);
+    console.log("[account changes]: ", accounts[0]);
   };
 
   const handleChainChanged = (chainId) => {
@@ -140,6 +123,7 @@ const WalletProvider = React.memo(({ children }) => {
         isAuthenticated,
         appLoading,
         account,
+        userSigner,
       }}
     >
       {children}
