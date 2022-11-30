@@ -10,7 +10,12 @@ const fetchGReviews = async (chainId, address, id) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         query: `{
-                  newReviews(assetHash: "${address}", assetId: ${id}) {
+                  newReviews(
+                    where: {
+                      assetHash: "${address}",
+                      assetId: "${id}"
+                    }
+                  ) {
                     id, sender, assetHash, assetId, review, rating
                   }
                 }`,
