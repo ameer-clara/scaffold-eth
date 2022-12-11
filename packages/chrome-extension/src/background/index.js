@@ -8,8 +8,6 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
       type: "popup",
       width: 400,
       height: 200,
-      left: 800,
-      top: 100,
     });
     sendResponse({ message: "Extension window opened" });
   }

@@ -1,6 +1,20 @@
 /* global chrome */
 
 var chainId = 0;
+var reviewsLoaded = false;
+
+
+
+/**
+ * Utils
+ */
+
+const waitForElement = async selector => {
+  while ( document.querySelector(selector) === null) {
+    await new Promise( resolve =>  requestAnimationFrame(resolve) )
+  }
+  return document.querySelector(selector);
+};
 
 const fetchGReviews = async (chainId, address, id) => {
   const review = await fetch(
@@ -47,8 +61,9 @@ const injectReviewForm = async (address, id) => {
   reviewSection.style = "padding: 0.5em; border: 1p solid #fafafa; border-radius: 5px;"
     + "background: #f5f5f5; margin: 0.5em;";
   reviewSection.innerHTML = `<h3 style="color: #68099a;">Reviews from The Graph</h3>`;
-  document.querySelector(".TradeStation--main")
-    .parentElement.appendChild(reviewSection);
+  // Provide fallback element
+  const firstSection = document.querySelector(".TradeStation--main") || document.querySelectorAll('item--frame')[0];
+  firstSection.parentElement.appendChild(reviewSection);
 
   // TODO: insert review form
 
@@ -76,13 +91,12 @@ const injectReviewForm = async (address, id) => {
 async function renderReviews(address, id) {
   const url = window.location;
   console.log("url:", window.location);
-  // const { address, id } = getAddressAndId(url) || "";
   // if address and id are found, then we are on an NFT page
   if (address && id) {
     console.log("On NFT page:");
     await injectReviewForm(address, id);
-
     // user on NFT page inject review area
+    // TODO
   } else if (url.href.includes("collection")) {
     console.log("On Collection page:");
   }
@@ -156,25 +170,41 @@ let sendPayloadToExtension = (nftPayload) => {
   });
 };
 
-// initial page load
-(async function main() {
+const checkAndRender = async() => {
   const url = window.location;
   console.log("url:", url);
   const nftPayload = getAddressAndId(url) || "";
   const { address, id } = nftPayload;
 
   // if address and id are found, then we are on an NFT page
-  if (address && id) {
+  if (address && id && !reviewsLoaded) {
     console.log("On NFT page:");
-
+    reviewsLoaded = true;
     // test comms with background script/extension
     sendPayloadToExtension(nftPayload);
-
     // Insert reviews
     await renderReviews(address, id);
-
     // user on NFT page inject review area
   } else if (url.href.includes("collection")) {
     console.log("On Collection page:");
   }
+};
+
+// initial page load
+(async function main() {
+  console.log('init checkAndRender');
+  await checkAndRender();
+
+  var currentPath = window.location.pathname;
+  setInterval(async() => {
+      // Monitor for path change
+      if(window.location.pathname !== currentPath) {
+          reviewsLoaded = false;
+          currentPath = window.location.pathname;
+          waitForElement('.TradeStation--main').then(async () => {
+            console.log('waited checkAndRender');
+            await checkAndRender();
+          });
+      }
+  }, 100);
 })();
