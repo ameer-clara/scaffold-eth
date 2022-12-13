@@ -3,8 +3,6 @@
 var chainId = 0;
 var reviewsLoaded = false;
 
-
-
 /**
  * Utils
  */
@@ -16,7 +14,10 @@ const waitForElement = async selector => {
   return document.querySelector(selector);
 };
 
+// https://thegraph.com/hosted-service/subgraph/ameer-clara/honft-test
 const fetchGReviews = async (chainId, address, id) => {
+  // TODO: update contract to index "createdAt"
+  // then query and display
   const review = await fetch(
     `https://api.thegraph.com/subgraphs/name/ameer-clara/honft-test`,
     {
@@ -40,32 +41,85 @@ const fetchGReviews = async (chainId, address, id) => {
   return (await review.json())?.data?.newReviews;
 };
 
-const buildReviewsHtml = ({ createdAt, userName, sender, rating, review }) => {
-  let html = `
-        <div display="inline-block">
-          <span class="row">Posted: <i>Today</i> &nbsp;&nbsp; Rating: ${"⭐".repeat(rating)}</span>
-          <span class="row"><a class="styles__StyledLink-sc-l6elh8-0 hubhNL Blockreact__Block-sc-1xf18x6-0 laCjUo AccountLink--ellipsis-overflow" href="${sender}"></a></span><br/></br/>
-          <span class="row" style="font-size: 15px; padding: 10px 0px;">${review}</span><br/><br/>
-        </div>
-        <hr/>`;
+/**
+ * Components to render
+ */
+
+const buildReviewsHtml = ({ createdAt, sender, rating, review }) => {
+  // TODO: include createdAt
+  // const d = new Date(createdAt);
+  // <i>${d.toDateString()}</i>
+  const html = `
+    <div class="reviews__review-metadata">
+      Reviewed by <a class="reviews-link" href="/${sender}">${sender.slice(-6)}</a>
+      <div class="reviews-stars">${"⭐".repeat(rating)}</div>
+    </div>
+    <div class="reviews__review-text">
+      ${review}
+    </div>
+  `;
   const el = document.createElement("div");
   el.innerHTML = html;
-  el.style = "padding:0.5em;";
-  el.className = "review-wrap";
+  el.className = "reviews__review-block";
   return el;
 };
 
-const injectReviewForm = async (address, id) => {
+const buildReviewForm = () => {
+  const html = `
+    <a class="reviews__add_btn" href="#reviewForm">
+      Add Review
+    </a>
+    <form id="reviewForm" class="reviews__review-form">
+      <label>Rating<br/>
+        <div class="reviews__review-form__stars">
+          ${ [1,2,3,4,5].map(val => {
+            return (`<label>
+              <input type="radio" name="stars" value="${val}" />
+              ${'<span class="star-icon">⭐</span>'.repeat(val)}
+            </label>`)
+          }).join('')}
+        </div>
+      </label>
+      <label>Review<br/>
+        <textarea class="reviews__review-form__body" placeholder="This NFT..."></textarea>
+      </label>
+      <button class="reviews__submit_btn" type="submit">
+          Submit
+      </button>
+    </form>
+  `
+  const el = document.createElement("div");
+  el.innerHTML = html;
+  el.className = "reviews__review-form-wrap";
+  return el;
+};
+
+const injectReviews = async (address, id) => {
   console.log("injecting review form");
   const reviewSection = document.createElement("div");
-  reviewSection.style = "padding: 0.5em; border: 1p solid #fafafa; border-radius: 5px;"
-    + "background: #f5f5f5; margin: 0.5em;";
-  reviewSection.innerHTML = `<h3 style="color: #68099a;">Reviews from The Graph</h3>`;
-  // Provide fallback element
+  reviewSection.className = "reviews-section";
+  reviewSection.innerHTML = `<h3 class="reviews-header">Reviews from The Graph</h3>`;
+  // Provide fallback parent element
   const firstSection = document.querySelector(".TradeStation--main") || document.querySelectorAll('item--frame')[0];
   firstSection.parentElement.appendChild(reviewSection);
+  // Show placeholder first
+  // "loading..."
 
   // TODO: insert review form
+  const reviewFormEl = buildReviewForm();
+  reviewSection.appendChild(reviewFormEl);
+  function processForm(e) {
+    if (e.preventDefault) e.preventDefault();
+      console.log(e);
+      return false;
+  }
+
+  var form = document.getElementById('reviewForm');
+  if (form.attachEvent) {
+      form.attachEvent("submit", processForm);
+  } else {
+      form.addEventListener("submit", processForm);
+  }
 
   // don't process if there are no reviews
   const fetchReviews = await fetchGReviews(chainId, address, id);
@@ -94,7 +148,7 @@ async function renderReviews(address, id) {
   // if address and id are found, then we are on an NFT page
   if (address && id) {
     console.log("On NFT page:");
-    await injectReviewForm(address, id);
+    await injectReviews(address, id);
     // user on NFT page inject review area
     // TODO
   } else if (url.href.includes("collection")) {

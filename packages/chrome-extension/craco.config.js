@@ -1,3 +1,6 @@
+const CopyPlugin = require("copy-webpack-plugin");
+
+
 module.exports = {
   webpack: {
     configure: (webpackConfig, { env, paths }) => {
@@ -20,6 +23,14 @@ module.exports = {
           ...webpackConfig.optimization,
           runtimeChunk: false,
         },
+        plugins: [...webpackConfig.plugins,
+          new CopyPlugin({
+            patterns: [
+              { from: "./src/content-scripts/opensea.css",
+                to: "static/css/opensea.css" }
+            ],
+          }),
+        ]
       };
     },
   },
