@@ -9,10 +9,19 @@
     background: #fefefe;
     border-radius: 5px;
     margin: 0.5em;
+    position: relative;
+}
+
+.reviews-section h2 {
+    font-size: 1.25em;
+    font-weight: 400;
+    color: #05111d;
 }
 
 .reviews-stars {
     float: right;
+    font-size: 13px;
+    letter-spacing: 1px;
 }
 
 .reviews__review-block {
@@ -48,6 +57,10 @@ a.reviews__add_btn {
     background: rgb(32, 129, 226);
     border-radius: 8px;
     color: #fff;
+    text-decoration: none;
+    position: absolute;
+    top: 2em;
+    right: 0;
 }
 
 a.reviews__add_btn:hover {
@@ -56,6 +69,7 @@ a.reviews__add_btn:hover {
 /* Form elements */
 .reviews__review-form-wrap {
     border-bottom: 0.5px solid #cdcdcd;
+    margin-bottom: 1em;
 }
 
 .reviews__review-form__body {
@@ -67,13 +81,33 @@ a.reviews__add_btn:hover {
     border-radius: 5px;
 }
 
-.reviews__review-form > label {
+.reviews__review-form-inner > label {
     display: block;
     margin: 0.5em 0;
 }
 
 .reviews__review-form {
-    padding-top: 1em;
+    margin-top: -200px; /* scroll offset */
+    margin-bottom: 0.5em;
+}
+
+.reviews__review-form-inner {
+    padding: 1em;
+    border: 0.5px solid #cdcdcd;
+    border-radius: 8px;
+}
+
+.reviews__review-form:before {
+    height: 200px;
+    display: block;
+    content: ' ';
+    width: 100%;
+    background: transparent;
+    pointer-events: none;
+}
+
+.reviews__review-form h2 {
+    margin-top: 0px;
 }
 
 #reviewForm {
@@ -91,9 +125,10 @@ a.reviews__add_btn:hover {
 .reviews__review-form__stars {
     display: inline-block;
     position: relative;
-    height: 36px;
-    line-height: 36px;
-    font-size: 36px;
+    height: 28px;
+    line-height: 28px;
+    font-size: 28px;
+    margin-top: 2px;
     padding-bottom: 0.5em;
 }
 
@@ -152,5 +187,5 @@ a.reviews__add_btn:hover {
     background: rgb(32, 129, 226);
     border-radius: 8px;
     color: #fff;
-    margin: 0.5em 0;
+    margin: 0;
 }

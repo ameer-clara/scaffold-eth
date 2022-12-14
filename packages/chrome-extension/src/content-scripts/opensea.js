@@ -67,24 +67,27 @@ const buildReviewsHtml = ({ createdAt, sender, rating, review }) => {
 const buildReviewForm = (assetHash, assetId) => {
   const html = `
     <form id="reviewForm" class="reviews__review-form">
-      <label>Rating<br/>
-        <div class="reviews__review-form__stars">
-          ${ [1,2,3,4,5].map(val => {
-            return (`<label>
-              <input type="radio" name="stars" value="${val}" />
-              ${'<span class="star-icon">⭐</span>'.repeat(val)}
-            </label>`)
-          }).join('')}
-        </div>
-      </label>
-      <label>Review<br/>
-        <textarea name="review" class="reviews__review-form__body" placeholder="This NFT..."></textarea>
-      </label>
-      <input name="assetHash" hidden="true" type="text" value="${assetHash}" />
-      <input name="assetId" hidden="true" type="number" value="${assetId}" />
-      <button class="reviews__submit_btn" type="submit">
-          Submit
-      </button>
+      <div class="reviews__review-form-inner">
+        <h2>New Review</h2>
+        <label>Rating<br/>
+          <div class="reviews__review-form__stars">
+            ${ [1,2,3,4,5].map(val => {
+              return (`<label>
+                <input type="radio" name="stars" value="${val}" />
+                ${'<span class="star-icon">⭐</span>'.repeat(val)}
+              </label>`)
+            }).join('')}
+          </div>
+        </label>
+        <label>Review<br/>
+          <textarea name="review" class="reviews__review-form__body" placeholder="This NFT..."></textarea>
+        </label>
+        <input name="assetHash" hidden="true" type="text" value="${assetHash}" />
+        <input name="assetId" hidden="true" type="number" value="${assetId}" />
+        <button class="reviews__submit_btn" type="submit">
+            Submit
+        </button>
+      </div>
     </form>
     <a class="reviews__add_btn" href="#reviewForm">
       Add Review
@@ -94,6 +97,14 @@ const buildReviewForm = (assetHash, assetId) => {
   el.innerHTML = html;
   el.className = "reviews__review-form-wrap";
   return el;
+};
+
+const setReviewFormStatus = (status) => {
+  const formWrapEl = document.querySelector('.reviews__review-form');
+  formWrapEl.innerHTML = `
+    <h2>New Review</h2>
+    <p>Submitting...</p>
+  `
 };
 
 const injectReviews = async (address, id) => {
@@ -116,12 +127,14 @@ const injectReviews = async (address, id) => {
       var formData = new FormData(e.target);
       var formObj = Object.fromEntries(formData);
       console.log(formObj);
+      // setting loading status
+      setReviewFormStatus('Submitting review...');
       sendPayloadToExtension({
         assetHash: formObj['assetHash'],
         assetId: formObj['assetId'],
         review: formObj['review'],
         rating: formObj['stars']
-      })
+      }, true);
       return false;
   }
 
@@ -222,7 +235,7 @@ function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-let sendPayloadToExtension = (nftPayload) => {
+let sendPayloadToExtension = (nftPayload, isSubmission) => {
   // send message to the background script to open the extension in a popup window
   chrome.runtime.sendMessage({ open: true }, async (response) => {
     console.log(response);
@@ -232,6 +245,9 @@ let sendPayloadToExtension = (nftPayload) => {
     console.log("sending payload....", nftPayload);
     chrome.runtime.sendMessage(nftPayload, (response) => {
       console.log(response);
+      if (isSubmission) {
+        setReviewFormStatus("Please confirm transaction.");
+      }
     });
   });
 };
