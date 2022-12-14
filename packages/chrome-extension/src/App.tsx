@@ -23,7 +23,7 @@ function App() {
 
   const sendTx = async (assetHash: any, assetId: any, review: any, rating: any) => {
     console.log('Attempting sendTx!');
-    const createTx = await writeContracts.HumbleOpinion.create(review, false, assetHash, assetId, rating, 5);
+    const createTx = await writeContracts.HumbleOpinion.create(review, false, assetHash, assetId, parseInt(rating), 1);
 
     // @ts-ignore
     const result = tx(createTx, (update) => {
@@ -65,7 +65,9 @@ function App() {
           <button onClick={isAuthenticated ? disconnectWallet : connectWallet} id='wallet-connect'>
             {isAuthenticated ? 'Disconnect Wallet' : 'Connect Wallet'}
           </button>
-          <button onClick={async () => { await sendTx('xxx', '100', "Btn test", 3); }}>Send Tx</button>
+          <button onClick={async () => { await sendTx('xxx', '100', "Btn test", 3); }}>
+            Send Tx
+          </button>
         </p>
       </header>
     </div>
