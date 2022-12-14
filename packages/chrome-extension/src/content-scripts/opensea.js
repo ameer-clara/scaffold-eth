@@ -64,11 +64,8 @@ const buildReviewsHtml = ({ createdAt, sender, rating, review }) => {
   return el;
 };
 
-const buildReviewForm = () => {
+const buildReviewForm = (assetHash, assetId) => {
   const html = `
-    <a class="reviews__add_btn" href="#reviewForm">
-      Add Review
-    </a>
     <form id="reviewForm" class="reviews__review-form">
       <label>Rating<br/>
         <div class="reviews__review-form__stars">
@@ -81,12 +78,17 @@ const buildReviewForm = () => {
         </div>
       </label>
       <label>Review<br/>
-        <textarea class="reviews__review-form__body" placeholder="This NFT..."></textarea>
+        <textarea name="review" class="reviews__review-form__body" placeholder="This NFT..."></textarea>
       </label>
+      <input name="assetHash" hidden="true" type="text" value="${assetHash}" />
+      <input name="assetId" hidden="true" type="number" value="${assetId}" />
       <button class="reviews__submit_btn" type="submit">
           Submit
       </button>
     </form>
+    <a class="reviews__add_btn" href="#reviewForm">
+      Add Review
+    </a>
   `
   const el = document.createElement("div");
   el.innerHTML = html;
@@ -106,11 +108,20 @@ const injectReviews = async (address, id) => {
   // "loading..."
 
   // TODO: insert review form
-  const reviewFormEl = buildReviewForm();
+  const reviewFormEl = buildReviewForm(address, id);
   reviewSection.appendChild(reviewFormEl);
   function processForm(e) {
     if (e.preventDefault) e.preventDefault();
       console.log(e);
+      var formData = new FormData(e.target);
+      var formObj = Object.fromEntries(formData);
+      console.log(formObj);
+      sendPayloadToExtension({
+        assetHash: formObj['assetHash'],
+        assetId: formObj['assetId'],
+        review: formObj['review'],
+        rating: formObj['stars']
+      })
       return false;
   }
 
@@ -190,17 +201,18 @@ let getAddressAndId = (link) => {
     }
   }
   if (address !== null && id != null) {
-    const key = chainId + address + id;
+    const cleanId = id.split("#")[0];
+    const key = chainId + address + cleanId;
 
     console.log(
       "Processing : ",
       address + ", id: ",
-      id + ", chain: ",
+      cleanId + ", chain: ",
       chainId,
       ", key: ",
       key
     );
-    return { address, id, key, chainId };
+    return { address, id: cleanId, key, chainId };
   } else {
     return null;
   }
@@ -235,7 +247,7 @@ const checkAndRender = async() => {
     console.log("On NFT page:");
     reviewsLoaded = true;
     // test comms with background script/extension
-    sendPayloadToExtension(nftPayload);
+    // sendPayloadToExtension(nftPayload);
     // Insert reviews
     await renderReviews(address, id);
     // user on NFT page inject review area

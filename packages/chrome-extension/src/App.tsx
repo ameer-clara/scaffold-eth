@@ -5,6 +5,7 @@ import Transactor from './utils/Transactor';
 import { useGasPrice, useContractLoader } from 'eth-hooks';
 import { NETWORKS } from './constants';
 import deployedContracts from './contracts/hardhat_contracts.json';
+import { useEffect } from 'react';
 
 const targetNetwork = NETWORKS.goerli;
 
@@ -20,8 +21,9 @@ function App() {
   // The transactor wraps transactions and provides notificiations
   const tx = Transactor(userSigner, gasPrice) || undefined;
 
-  const sendTx = async () => {
-    const createTx = writeContracts.HumbleOpinion.create('review from chrome extension', false, '0xe4339c37b171761f808a0c25c77f50d512edd4ca', '6', 3, 1);
+  const sendTx = async (assetHash: any, assetId: any, review: any, rating: any) => {
+    console.log('Attempting sendTx!');
+    const createTx = await writeContracts.HumbleOpinion.create(review, false, assetHash, assetId, rating, 5);
 
     // @ts-ignore
     const result = tx(createTx, (update) => {
@@ -35,18 +37,24 @@ function App() {
     console.log(await result);
   };
 
-  const messageFromContentScript = (message: any, sender: any, sendResponse: any) => {
-    if (message.address) {
+  const messageFromContentScript = async (message: any, sender: any, sendResponse: any) => {
+    if (message.assetHash) {
       connectWallet();
       // trigger transaction
-      // sendTx(message.address, message.id, message.chainId);
+      await sendTx(message.assetHash, message.assetId, message.review, message.rating);
 
       sendResponse({
         message: 'Transaction submitted',
       });
     }
   };
-  chrome.runtime.onMessage.addListener(messageFromContentScript);
+
+  useEffect(() => {
+    chrome.runtime.onMessage.addListener(messageFromContentScript);
+    return function cleanup() {
+      chrome.runtime.onMessage.removeListener(messageFromContentScript);
+    };
+  })
 
   return (
     <div className='App'>
@@ -57,7 +65,7 @@ function App() {
           <button onClick={isAuthenticated ? disconnectWallet : connectWallet} id='wallet-connect'>
             {isAuthenticated ? 'Disconnect Wallet' : 'Connect Wallet'}
           </button>
-          <button onClick={sendTx}>Send Tx</button>
+          <button onClick={async () => { await sendTx('xxx', '100', "Btn test", 3); }}>Send Tx</button>
         </p>
       </header>
     </div>
